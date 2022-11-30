@@ -1,0 +1,310 @@
+STRUCTURE
+
+<!--final_project-->
+<!--    - admin-->
+<!--    - public-->
+<!--        - css-->
+<!--        - js-->
+<!--        - index.php-->
+<!--    - database-->
+<!--    - views-->
+<!--        - shared / partials-->
+<!--            - head.php-->
+<!--            - footer.php-->
+<!--        - auth-->
+<!--            - login.php-->
+<!--            - registration.php-->
+<!---->
+<!--        - profile-->
+<!--        - contact.php-->
+<!--        - index.php-->
+
+
+
+
+
+LOGIN
+
+<?php
+include 'includes/sessions.php';
+try {
+    $pdo = new PDO('mysql:host=127.0.0.1;port=3307;dbname=lasalle_db;', 'user', 'user', [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ]);
+} catch (PDOException $e) {
+    throw new PDOException($e->getMessage());
+}
+session_start();
+$logged_in = $_SESSION['logged_in'] ?? false;
+
+if ($logged_in) {                              // If already logged in
+    header('Location: account.php');           // Redirect to account page
+    exit;                                      // Stop further code running
+}
+
+if(isset($_POST['logged_in']))
+{
+    $email=$_POST['email'];
+    $password=md5($_POST['pw']);
+    $sql ="SELECT email,password FROM students WHERE email=:email and password=:password";
+    $stmt = $pdo->prepare -> prepare($sql);
+    $stmt-> bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt-> bindParam(':pw', $password, PDO::PARAM_STR);
+    $stmt-> execute();
+    $results=$stmt->fetchAll(PDO::FETCH_OBJ);
+    if($stmt->rowCount() > 0)
+    {
+        $_SESSION['logged_in']=$_POST['email'];
+        login();                               // Call login function
+        header('Location: account.php');       // Redirect to account page
+        exit;                                  // Stop further code running
+    }
+}
+?>
+<?php include 'includes/header.php';?>
+
+<!---->
+<!--//FUNCTION FROM SESSION-->
+<!---->
+<!--//function login(): void-->
+<!--//{-->
+<!--//    session_regenerate_id(true);-->
+<!--//    $_SESSION['logged_in'] = true;-->
+<!--//}-->
+
+<!--$password = "";-->
+<!--$email    = "";-->
+<!--$errors = array();-->
+<!---->
+<!--$logged_in = true;-->
+<!--if ($logged_in) {-->
+<!--    header('Location: account.php');-->
+<!--    exit;-->
+<!--}-->
+<!---->
+<!--if($_SERVER['REQUEST_METHOD'] == 'POST') {-->
+<!--    $user_email    = $_POST['email'];-->
+<!--    $user_password = $_POST['password'];-->
+<!---->
+<!--    if ($user_email == $email and $user_password == $password) {-->
+<!--        login();-->
+<!--        header('Location: account.php');-->
+<!--        exit;-->
+<!--    }-->
+<!--}-->
+<!---->
+<!--?>-->
+
+
+    <head>
+        <link href="css/style.css" rel="stylesheet">
+        <title>Login</title>
+    </head>
+    <h1>Login</h1>
+    <form class="login" method="post" >
+
+        <label>
+            <input type="text" name="email" placeholder="Email">
+        </label>
+        <label>
+            <input type="password" name="pw" placeholder="Password">
+        </label>
+        <br>
+        <button type="submit" name="submit">LOGIN</button>
+
+    </form>
+
+
+
+
+LOGOUT
+
+<?php
+include 'includes/sessions.php';
+//logout();
+//header('Location: login.php');
+
+try {
+    $pdo = new PDO('mysql:host=127.0.0.1;port=3307;dbname=lasalle_db;', 'user', 'user', [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ]);
+} catch (PDOException $e) {
+    throw new PDOException($e->getMessage());
+}
+
+session_start();
+//destroy the session
+session_unset();
+//redirect to login page
+header("location: login.php");
+?>
+
+
+
+
+
+style_login
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: darkblue;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: blue;
+}
+body {
+    font-family: 'Quicksand', sans-serif;
+    text-align: center;
+    background-position: center;
+}
+
+.page {
+    border : 3px solid #fff;
+    width: max-content;
+    margin: 50px auto;
+}
+
+form {
+    text-align: left;
+    position: relative;
+    z-index: 1;
+    background: lightsteelblue;
+    max-width: 360px;
+    margin: 0 auto 100px;
+    padding: 45px;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+input {
+    font-family: "Roboto", sans-serif;
+    outline: 0;
+    background: #f2f2f2;
+    width: 100%;
+    border: 0;
+    margin: 0 0 15px;
+    padding: 15px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+input[type='submit'] {
+    font-family: "Roboto", sans-serif;
+    text-transform: uppercase;
+    outline: 0;
+    background-color: darkblue;
+    width: 100%;
+    border: 0;
+    padding: 15px;
+    color: #FFFFFF;
+    font-size: 14px;
+    cursor: pointer;
+}
+form .message {
+    margin: 15px 0 0;
+    color: #b3b3b3;
+    font-size: 12px;
+}
+
+
+.container {
+    position: relative;
+    z-index: 1;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+
+
+
+<?php
+////if(!isset($_SESSION)) { session_start(); }
+////
+////// initializing variables
+////$password = "";
+////$email    = "";
+////$errors = array();
+////
+////
+////// connect to the database
+////try {
+////    $pdo = new PDO('mysql:host=127.0.0.1;port=3307;dbname=lasalle_db;', 'user', 'user', [
+////        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+////        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+////        PDO::ATTR_EMULATE_PREPARES => false,
+////    ]);
+////} catch (PDOException $e) {
+////    throw new PDOException($e->getMessage());
+////}
+//
+//
+////function login(): void
+////{
+////    session_regenerate_id(true);
+////    $_SESSION['logged_in'] = true;
+////}
+////
+////function logout(): void
+////{
+////    session_unset();
+////
+////    session_destroy();
+////}
+////
+////function require_login($logged_in): void
+////{
+////    if (!$logged_in) {
+////        header('Location: login.php');
+////        exit;
+////    }
+////}
+//
+//
+//session_start();                                         // Start/renew session
+//$logged_in = $_SESSION['logged_in'] ?? false;            // Is user logged in?
+//
+////$email = 'ivy@eg.link';                              // Email address to login
+////$password = 'password';                                 // Password to login
+//
+//function login()                                         // Remember user passed login
+//{
+//    session_regenerate_id(true);                         // Update session id
+//    $_SESSION['logged_in'] = true;                       // Set logged_in key to true
+//}
+//
+//function logout()                                        // Terminate the session
+//{
+//    $_SESSION = [];                                      // Clear contents of array
+//
+//    $params = session_get_cookie_params();               // Get session cookie parameters
+//    setcookie('PHPSESSID', '', time() - 3600, $params['path'], $params['domain'],
+//        $params['secure'], $params['httponly']);         // Delete session cookie
+//
+//    session_destroy();                                   // Delete session file
+//}
+//
+//function require_login($logged_in)                       // Check if user logged in
+//{
+//    if ($logged_in == false) {                           // If not logged in
+//        header('Location: login.php');                   // Send to login page
+//        exit;                                            // Stop rest of page running
+//    }
+//}
+
